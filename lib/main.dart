@@ -28,6 +28,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future data;
   Future<List<Album>> _getAlbum() async {
     var data = await http.get("https://jsonplaceholder.typicode.com/photos");
     var jsonData = json.decode(data.body);
@@ -44,6 +45,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    data = _getAlbum();
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -51,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
           child: FutureBuilder(
-        future: _getAlbum(),
+        future: data,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.data == null) {
             return Container(
@@ -72,9 +78,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Material(
                       child: InkWell(
                         onTap: () {},
+                        splashColor: Colors.brown.withOpacity(0.5),
                         child: GridTile(
-                          child:
-                              Image.network(snapshot.data[index].thumbNailUrl),
+                          child: FadeInImage.assetNetwork(
+                              fit: BoxFit.cover, image: snapshot.data[index].thumbNailUrl,
+                               placeholder: snapshot.data[index].thumbNailUrl,
+                               width: 100,
+                               height: 100,
+                              ),
                           footer: Container(
                             color: Colors.black12,
                             child: ListTile(
@@ -83,6 +94,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                 style: TextStyle(fontWeight: FontWeight.bold),
                                 textAlign: TextAlign.center,
                               ),
+                              trailing: new IconButton(
+                                icon: Icon(Icons.favorite,color: Colors.white70), 
+                                highlightColor: Colors.pink,
+                              onPressed: () {
+                                
+                              },
+                              )
                             ),
                           ),
                         ),
